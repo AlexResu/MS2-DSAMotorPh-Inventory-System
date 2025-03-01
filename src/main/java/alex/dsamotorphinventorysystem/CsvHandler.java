@@ -10,17 +10,19 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The {@code CsvReader} class provides methods for reading and processing CSV files.
- * 
+ * The {@code CsvHandler} class provides methods for reading and processing CSV files.
+ * It handles loading inventory data from a CSV, deleting specific records, and appending new items to the CSV.
+ * This class works with the MotorPH Inventory System to persist stock data to a CSV file.
  * @author Alex Resurreccion
  */
 public class CsvHandler {
     private String fileName = "resources/MotorPH Inventory Data - March 2023 Inventory Data.csv";
+    
+    // Loads inventory data from the CSV file into a Binary Search Tree (BST).
     public void loadInventory(StockBST bst) {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -39,9 +41,17 @@ public class CsvHandler {
         }
     }
     
+    /**
+     * Deletes a stock item from the CSV file based on the provided engine number.
+     * It creates a temporary file, writes all lines except the one to be deleted, 
+     * and then renames the temporary file to replace the original CSV file.
+     * 
+     * @param engineNumberToDelete The engine number of the stock item to be deleted.
+     * @return true if the item was successfully deleted, false otherwise.
+     */
     public boolean delete(String engineNumberToDelete){
-        File inputFile = new File(fileName);
-        File tempFile = new File("myTempFile.csv");
+        File inputFile = new File(fileName); // original CSV file
+        File tempFile = new File("myTempFile.csv"); // temporary file to store updated data
         
         try {
             BufferedReader reader = new BufferedReader(new FileReader(inputFile));
@@ -70,6 +80,12 @@ public class CsvHandler {
         return isDeleted;
     }
     
+    /**
+     * Appends a new stock item to the CSV file.
+     * It writes the provided stock information to the CSV file, with each field separated by commas.
+     * 
+     * @param itemInfo The stock item data to append, represented as a String array.
+     */
     public void add(String[] itemInfo){
         BufferedWriter writer;
         try {
@@ -82,10 +98,11 @@ public class CsvHandler {
     }
     
     /**
-     * Splits a string by comma
+     * Splits a string by commas and returns the resulting array of strings.
+     * This method is typically used to parse a line from a CSV file.
      * 
      * @param data The string to be split.
-     * @return An array of strings resulting from the split.
+     * @return An array of strings resulting from splitting the input string by commas.
      */
     public String[] splitStringByComma(String data){
         return data.split(",");

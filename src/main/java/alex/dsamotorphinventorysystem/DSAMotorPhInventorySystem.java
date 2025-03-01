@@ -12,23 +12,31 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * DSAMotorPhInventory manages inventory using a Binary Search Tree (BST) for fast search, add, and delete operations.
- * It supports adding, deleting, sorting (using Merge Sort), and searching stock items efficiently.
+ *  DSAMotorPhInventorySystem manages an inventory using a Binary Search Tree (BST)
+ * for efficient search, insertion, and deletion operations. It supports adding,
+ * deleting, sorting (using Merge Sort), and searching stock items.
+ * 
+ * The system ensures structured storage, maintains sorted data for quick access,
+ * and integrates CSV handling for persistent storage.
  * @author Alex Resurreccion
  */
 public class DSAMotorPhInventorySystem { 
     private static StockBST inventory = new StockBST(); // Binary Search Tree for inventory management
-    private static Stock stock;
+    private static Stock stock; //// placeholder for individual stock items
     private static Scanner scanner = new Scanner(System.in);
-    private static CsvHandler csvHandler = new CsvHandler();
+    private static CsvHandler csvHandler = new CsvHandler(); // handler for CSV file operations
     
 
     public static void main(String[] args) {
-        csvHandler.loadInventory(inventory);
+        csvHandler.loadInventory(inventory); // load existing inventory data from CSV
         System.out.println("***Welcome to MotoroPH Inventory App!***\n");
         menu();
     }
     
+    /**
+     * Displays the main menu and handles user selections.
+     * Users can add, delete, sort, search, or exit the system.
+     */
     public static void menu() {
         stock = null; // refresh stock state upon returning to menu
         try {
@@ -56,6 +64,11 @@ public class DSAMotorPhInventorySystem {
         }
     }
     
+    
+    /**
+     * Handles adding a new stock item to the inventory.
+     * Ensures that duplicate engine numbers are not allowed.
+     */
     public static void addStock() {
         System.out.print("Enter Engine Number: ");
         String engineNumber = scanner.nextLine();
@@ -76,6 +89,11 @@ public class DSAMotorPhInventorySystem {
         newTransactionPrompt();
     }
     
+    
+    /**
+     * Captures stock details and inserts the new stock into the BST and CSV.
+     * @param engineNumber Unique identifier for the stock.
+     */
     public static void addNewStock(String engineNumber){
         String isInfoCorrect;
         Date date = new Date();
@@ -95,19 +113,28 @@ public class DSAMotorPhInventorySystem {
         isInfoCorrect = scanner.nextLine();
 
         
+        // If user confirms, add stock to the BST and CSV
         if(isInfoCorrect.equals("y")){
             csvHandler.add(newStock); // for csv add
-            inventory.insert(stock);
+            inventory.insert(stock); // Add to BST
             System.out.println("Stock added successfully.");
         } else {
             addNewStock(engineNumber);
         }
     }
     
+     /**
+     * Helper method to create and set stock information. 
+     */
     public static void setStock(String engineNumber, String date, String stockLabel, String brand, String status){
         stock = new Stock(engineNumber, date, stockLabel, brand, status);
     }
     
+    
+     /**
+     * Searches for a stock item in the inventory.
+     * Displays the stock information if found.
+     */
     public static void searchStock() {
         System.out.print("Enter Engine Number to Search: ");
         String engineNumber = scanner.nextLine();
@@ -121,6 +148,11 @@ public class DSAMotorPhInventorySystem {
         newTransactionPrompt();
     }
     
+    
+    /**
+     *  Deletes a stock item from the inventory after confirming with the user.
+     *  The item must be marked as "Old" and "Sold" to be deletable.
+     */
     public static void deleteStock() {
         System.out.print("Enter Engine Number to Delete: ");
         String engineNumber = scanner.nextLine();
@@ -157,26 +189,36 @@ public class DSAMotorPhInventorySystem {
         newTransactionPrompt();
     }
     
+    
+    /**
+     * Sorts the stocks in the inventory either in ascending or descending order 
+     * based on the brand name using Merge Sort.
+     */
     public static void sortStocks() {
         System.out.println("Type \"y\" to sort brand in ascending order or type \"n\" to in descending order");
         String sortOrder = scanner.nextLine();
         
-        List<Stock> sortedList = inventory.getAllStocks();
-        sortedList = mergeSort(sortedList);
+        List<Stock> sortedList = inventory.getAllStocks(); // get all stocks from the inventory
+        sortedList = mergeSort(sortedList); // perform merge sort on the list
         
+        // Reverse the list if the user chose descending order
         if(sortOrder.equals("n")){
             sortedList = sortedList.reversed();
         } else if(!sortOrder.equals("y")){
             System.out.println("Invalid input, please choose valid input");
-            sortStocks();
+            sortStocks(); // retry if invalid input is given
         }
         
+        // Display the sorted stocks
         for (Stock stock : sortedList) {
             System.out.println(stock);
         }
         newTransactionPrompt();
     }
     
+    /**
+     * Performs a merge sort on the list of stocks.
+     */
     public static List<Stock> mergeSort(List<Stock> list) { 
         if (list.size() <= 1) return list;
         
@@ -187,10 +229,15 @@ public class DSAMotorPhInventorySystem {
         return merge(left, right);
     }
     
+    
+    /**
+     * Merges two sorted lists into a single sorted list.
+     */
     public static List<Stock> merge(List<Stock> left, List<Stock> right) {
         List<Stock> merged = new ArrayList<>();
         int i = 0, j = 0;
         
+        // Merge two sorted lists while maintaining the sort order
         while (i < left.size() && j < right.size()) {
             if (left.get(i).getBrand().compareTo(right.get(j).getBrand()) <= 0) {
                 merged.add(left.get(i++)); 
@@ -205,9 +252,7 @@ public class DSAMotorPhInventorySystem {
         return merged;
     }
     
-    /**
-     * Prompts the user to either exit the program or perform another transaction.
-     */
+    //Prompts the user to either exit the program or return to the main menu.
     public static void newTransactionPrompt(){
         System.out.println("Type x to exit or anything to make another transaction");
         String userInput = scanner.nextLine();
